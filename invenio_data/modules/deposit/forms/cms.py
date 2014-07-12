@@ -42,6 +42,37 @@ class CollectionsField(WebDepositForm):
         default='CMS',
     )
 
+class FinalStateParticlesForm(WebDepositForm):
+    particle_options = [("Electron", _("Electron")),
+                       ("Muon", _("Muon")),
+                       ("Gamma", _("Gamma")),
+                       ("B-Jet", _("B-Jet")),
+                       ("Tau-Jet", _("Tau-Jet")),
+                       ("MET", _("MET"))]
+    particle = fields.SelectField(
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-3", widget=widgets.Select()),
+        label=_('Particle'),
+        choices=particle_options,
+        export_key='particle',
+        icon='fa fa-leaf fa-fw'
+    )
+    number = data_fields.TextField(
+        placeholder="Num",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-2"),
+    )
+    pt_cut = data_fields.TextField(
+        placeholder="PT",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-2"),
+    )
+    eta_cut = data_fields.TextField(
+        placeholder="ETA",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-2"),
+    )
+
 
 class SoftwareForm(WebDepositForm):
     sw = data_fields.TextField(
@@ -268,6 +299,22 @@ class CMSDataAnalysisForm(WebDepositForm):
         widget_classes='',
         min_entries=1,
         export_key='trigger_selection',
+    )
+
+    final_state_particles = fields.DynamicFieldList(
+        fields.FormField(
+            FinalStateParticlesForm,
+            widget=ExtendedListWidget(
+                item_widget=ItemWidget(),
+                html_tag='div'
+            ),
+        ),
+        label='Final State Particles',
+        icon='fa fa-arrow-left fa-fw',
+        widget_classes='',
+        min_entries=1,
+        export_key='final_state_particles',
+        description='Particle - Number - PT Cut - ETA Cut',
     )
 
     physics_objects = data_fields.TextField(
@@ -720,7 +767,8 @@ class CMSDataAnalysisForm(WebDepositForm):
             ['analysisnum', 'title', 'authors', 'abstract', 'accelerator',
                 'experiment']),
         ('Physics Information',
-            ['pridataset', 'mcdataset', 'triggerselection', 'physics_objects',
+            ['pridataset', 'mcdataset', 'triggerselection',
+                'final_state_particles', 'physics_objects',
                 'callibration', 'keywords', 'comments']),
         ('Pre-selection Step',
             ['pre_os', 'pre_software', 'pre_code', 'pre_input_data_files',
